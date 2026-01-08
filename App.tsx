@@ -25,15 +25,12 @@ export default function App() {
   const [schedule, setSchedule] = useState<Record<string, DayConfig>>(() => {
     const saved = localStorage.getItem('flexilog_schedule_v2');
     if (saved) return JSON.parse(saved);
-    
     const initial: Record<string, DayConfig> = {};
     Object.entries(INITIAL_SCHEDULE).forEach(([day, ids]) => {
       const steps: string[] = [];
       ids.forEach(id => {
         const ex = INITIAL_EXERCISES.find(e => e.id === id);
-        if (ex) {
-          for (let i = 0; i < ex.sets; i++) steps.push(id);
-        }
+        if (ex) for (let i = 0; i < ex.sets; i++) steps.push(id);
       });
       initial[day] = { steps };
     });
@@ -49,21 +46,11 @@ export default function App() {
   const [activeSession, setActiveSession] = useState<SessionState | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem('flexilog_exercises', JSON.stringify(exercises));
-  }, [exercises]);
-
-  useEffect(() => {
-    localStorage.setItem('flexilog_categories', JSON.stringify(categories));
-  }, [categories]);
-
-  useEffect(() => {
-    localStorage.setItem('flexilog_schedule_v2', JSON.stringify(schedule));
-  }, [schedule]);
-
-  useEffect(() => {
-    localStorage.setItem('flexilog_workout_logs', JSON.stringify(workoutLogs));
-  }, [workoutLogs]);
+  // Persist local state
+  useEffect(() => { localStorage.setItem('flexilog_exercises', JSON.stringify(exercises)); }, [exercises]);
+  useEffect(() => { localStorage.setItem('flexilog_categories', JSON.stringify(categories)); }, [categories]);
+  useEffect(() => { localStorage.setItem('flexilog_schedule_v2', JSON.stringify(schedule)); }, [schedule]);
+  useEffect(() => { localStorage.setItem('flexilog_workout_logs', JSON.stringify(workoutLogs)); }, [workoutLogs]);
 
   const startSession = (dayId: string) => {
     setActiveSession({
@@ -101,7 +88,7 @@ export default function App() {
   };
 
   const removeCategory = (cat: string) => {
-    if (window.confirm(`Delete category "${cat}"? This will not remove exercises but they will lose this classification.`)) {
+    if (window.confirm(`Delete category "${cat}"?`)) {
       setCategories(categories.filter(c => c !== cat));
     }
   };
@@ -148,26 +135,19 @@ export default function App() {
                   <div className="flex gap-4 mb-8">
                     <input 
                       type="text" 
-                      placeholder="New category name..."
+                      placeholder="New category..."
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && addCategory()}
                       className="flex-1 px-6 py-4 rounded-2xl border border-slate-200 font-bold outline-none focus:ring-4 focus:ring-blue-100 transition-all"
                     />
-                    <button 
-                      onClick={addCategory}
-                      className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
-                    >
-                      Add Category
-                    </button>
+                    <button onClick={addCategory} className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all">Add</button>
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {categories.map(cat => (
                       <div key={cat} className="group flex items-center gap-3 bg-slate-50 border border-slate-200 px-5 py-3 rounded-2xl hover:border-red-200 hover:bg-red-50 transition-all">
-                        <span className="font-black text-slate-700 text-sm group-hover:text-red-700">{cat}</span>
-                        <button onClick={() => removeCategory(cat)} className="text-slate-300 hover:text-red-600">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                        </button>
+                        <span className="font-black text-slate-700 text-sm">{cat}</span>
+                        <button onClick={() => removeCategory(cat)} className="text-slate-300 hover:text-red-600"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
                       </div>
                     ))}
                   </div>
@@ -180,9 +160,7 @@ export default function App() {
                     <span className="w-2 h-8 bg-emerald-600 rounded-full"></span>
                     Exercise Library
                   </h3>
-                  <button onClick={() => setView('LIBRARY')} className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm hover:bg-slate-800 shadow-xl transition-all">
-                    Open Library
-                  </button>
+                  <button onClick={() => setView('LIBRARY')} className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm hover:bg-slate-800 shadow-xl transition-all">Open Library</button>
                 </div>
              </section>
           </div>
@@ -223,15 +201,9 @@ export default function App() {
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">FlexiLog</h1>
           </div>
           <nav className="flex gap-2 sm:gap-4">
-            <button onClick={() => setView('DASHBOARD')} className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${view === 'DASHBOARD' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>
-              Dashboard
-            </button>
-            <button onClick={() => setView('LOGS')} className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${view === 'LOGS' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>
-              Logs
-            </button>
-            <button onClick={() => setView('SETTINGS')} className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${view === 'SETTINGS' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>
-              Settings
-            </button>
+            <button onClick={() => setView('DASHBOARD')} className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${view === 'DASHBOARD' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>Dashboard</button>
+            <button onClick={() => setView('LOGS')} className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${view === 'LOGS' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>Logs</button>
+            <button onClick={() => setView('SETTINGS')} className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${view === 'SETTINGS' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>Settings</button>
           </nav>
         </div>
       </header>
